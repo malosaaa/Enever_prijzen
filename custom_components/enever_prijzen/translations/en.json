@@ -1,0 +1,31 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Enever API",
+        "data": {
+          "api_token": "API Token",
+          "stroom_provider": "Power Provider",
+          "gas_provider": "Gas Provider",
+          "scan_interval": "Scan Interval (s)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "current_power": {
+        "name": "Current Power Price"
+      },
+      "current_gas": {
+        "name": "Current Gas Price"
+      },
+      "last_update": {
+        "name": "Last Update"
+      },
+      "errors": {
+        "name": "Errors"
+      }
+    }
+  }
+}
