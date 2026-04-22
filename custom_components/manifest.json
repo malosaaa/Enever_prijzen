@@ -1,8 +1,16 @@
 {
-  "domain": "enever_prijzen",
-  "name": "Enever Energieprijzen",
+  "domain": "Enever_prijzen",
+  "name": "Enever prijzen",
   "config_flow": true,
+  "documentation": "https://github.com/Malosaaa/Enever_prijzen",
+  "issue_tracker": "https://github.com/Malosaaa/Enever_prijzen/issues",
+  "codeowners": [
+    "@Malosaaa"
+  ],
+  "requirements": [],
+  "iot_class": "cloud_polling",
   "version": "1.0.0",
   "dependencies": [],
+  "after_dependencies": [],
   "integration_type": "service"
 }
