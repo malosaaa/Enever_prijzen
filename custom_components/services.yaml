@@ -1,0 +1,7 @@
+refresh:
+  name: Refresh Enever
+  description: Forceert een directe download van de nieuwste Enever energieprijzen op de achtergrond.
+
+clear_files:
+  name: Clear Cache (Enever)
+  description: Verwijdert de lokale Enever cache.
