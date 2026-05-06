@@ -1,5 +1,12 @@
 # 🇳🇱 Enever Energieprijzen voor Home Assistant
 
+> [!WARNING]
+> **API Rate Limit**: Voor niet-supporters (gratis accounts) geldt een limiet van **120 aanvragen per maand**.
+> Om onder dit limiet te blijven, stel de update-interval in op **23400** (6,5 uur).
+> * **Berekening**: 120 aanvragen / 31 dagen ≈ 3,8 aanvragen per dag.
+> * **Veiligheid**: 24 uur / 3,8 aanvragen ≈ elke 6,3 uur (6,5 uur is de veilige marge).
+> * **Alternatief**: Gebruik de `enever_prijzen.refresh` service call in een automation voor handmatige updates.
+
 WORD EEN SUPPORTER WANT ENEVER IS ECHT GEWELDIG!!
 https://enever.nl/supporter-van-enever/
 
@@ -9,6 +16,7 @@ https://enever.nl/supporter-van-enever/
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.5+-blue.svg)](https://www.home-assistant.io/)
 
 Een efficiënte en robuuste Home Assistant integratie die de actuele, all-in dynamische stroom- en gasprijzen ophaalt via de Enever.nl API. Perfect als vervanging voor verdwenen API's (zoals EasyEnergy) en essentieel voor het slim sturen van je apparaten op basis van de daadwerkelijke consumentenprijzen.
+
 
 ## ✨ Functionaliteiten
 
