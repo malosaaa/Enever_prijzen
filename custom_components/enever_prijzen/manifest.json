@@ -1,16 +1,16 @@
 {
   "domain": "enever_prijzen",
   "name": "Enever energie-prijzen",
-  "config_flow": true,
-  "documentation": "https://github.com/Malosaaa/enever_prijzen",
-  "issue_tracker": "https://github.com/Malosaaa/enever_prijzen/issues",
+  "after_dependencies": [],
   "codeowners": [
     "@Malosaaa"
   ],
-  "requirements": [],
-  "iot_class": "cloud_polling",
-  "version": "1.0.2",
+  "config_flow": true,
   "dependencies": [],
-  "after_dependencies": [],
-  "integration_type": "service"
+  "documentation": "https://github.com/Malosaaa/enever_prijzen",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/Malosaaa/enever_prijzen/issues",
+  "requirements": [],
+  "version": "1.0.2"
 }
