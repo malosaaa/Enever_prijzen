@@ -30,4 +30,5 @@ class EneverCache:
         if os.path.exists(self.cache_path):
             try:
                 os.remove(self.cache_path)
-            except Exception as e: pass
+            except Exception:
+                pass
