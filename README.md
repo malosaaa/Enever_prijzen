@@ -1,4 +1,56 @@
+<div align="center">
+  
 # 🇳🇱 Enever Energieprijzen voor Home Assistant
+
+</div>
+<p align="center">
+  <a href="https://github.com/DonTranQuiL/Enever_prijzen/releases">
+    <img src="https://img.shields.io/github/v/release/DonTranQuiL/Enever_prijzen?style=for-the-badge&color=007ec6" alt="Latest Release">
+  </a>
+  <a href="https://github.com/DonTranQuiL/Enever_prijzen/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/DonTranQuiL/Enever_prijzen?style=for-the-badge&color=007ec6" alt="License">
+  </a>
+  <a href="https://github.com/DonTranQuiL/Enever_prijzen/actions/workflows/hass-ci.yml">
+    <img src="https://github.com/DonTranQuiL/Enever_prijzen/actions/workflows/hass-ci.yml/badge.svg" alt="Home Assistant CI" style="height:28px;">
+  </a>
+
+  <a href="https://github.com/DonTranQuiL/Enever_prijzen/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/Enever_prijzen/codechecker.yml?style=for-the-badge&label=CODE%20CHECKS&color=5dbb0f" alt="Code Checks">
+  </a>
+  <a href="https://github.com/DonTranQuiL/Enever_prijzen/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/Enever_prijzen/pytest.yml?style=for-the-badge&label=TESTS&color=5dbb0f" alt="Tests">
+  </a>
+  <a href="https://github.com/DonTranQuiL/Enever_prijzen/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/Enever_prijzen/hacs.yaml?style=for-the-badge&label=HACS%20VALIDATION&color=5dbb0f" alt="HACS Validation">
+  </a>
+
+  <a href="https://github.com/pre-commit/pre-commit">
+    <img src="https://img.shields.io/badge/pre--commit-enabled-5dbb0f?style=for-the-badge" alt="pre-commit">
+  </a>
+  <a href="https://github.com/astral-sh/ruff">
+    <img src="https://img.shields.io/badge/code%20style-ruff-000000?style=for-the-badge" alt="Ruff">
+  </a>
+  <a href="https://codecov.io/gh/DonTranQuiL/Enever_prijzen">
+    <img src="https://codecov.io/gh/DonTranQuiL/Enever_prijzen/branch/main/graph/badge.svg" alt="Coverage" style="height:28px;">
+  </a>
+
+  <a href="https://hacs.xyz/">
+    <img src="https://img.shields.io/badge/HACS-CUSTOM-ff6e27?style=for-the-badge" alt="HACS">
+  </a>
+  <a href="https://www.home-assistant.io/">
+    <img src="https://img.shields.io/badge/Home%20Assistant-2024.5%2B-007ec6?style=for-the-badge" alt="Home Assistant">
+  </a>
+
+  <a href="https://github.com/DonTranQuiL">
+    <img src="https://img.shields.io/badge/maintainer-%40DonTranQuiL-007ec6?style=for-the-badge" alt="Maintainer">
+  </a>
+  <a href="https://ko-fi.com/DonTranQuiL">
+    <img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-ffdd00?style=for-the-badge" alt="Donate">
+  </a>
+  <a href="https://community.home-assistant.io/">
+    <img src="https://img.shields.io/badge/community-forum-007ec6?style=for-the-badge" alt="Community">
+  </a>
+</p>
 
 > [!WARNING]
 > **API Rate Limit**: Voor niet-supporters (gratis accounts) geldt een limiet van **120 aanvragen per maand**.
@@ -9,11 +61,6 @@
 
 WORD EEN SUPPORTER WANT ENEVER IS ECHT GEWELDIG!!
 https://enever.nl/supporter-van-enever/
-
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz/)
-[![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)](https://github.com/DonTranQuiL/enever_prijzen/releases)
-[![Maintained](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/DonTranQuiL/enever_prijzen/commits/main)
-[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.5+-blue.svg)](https://www.home-assistant.io/)
 
 Een efficiënte en robuuste Home Assistant integratie die de actuele, all-in dynamische stroom- en gasprijzen ophaalt via de Enever.nl API. Perfect als vervanging voor verdwenen API's (zoals EasyEnergy) en essentieel voor het slim sturen van je apparaten op basis van de daadwerkelijke consumentenprijzen.
 
