@@ -12,6 +12,7 @@ from custom_components.enever_prijzen.const import (
     DEFAULT_SCAN_INTERVAL,
 )
 
+
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(enable_custom_integrations):
     """Enable loading custom components during testing."""
@@ -66,7 +67,11 @@ async def test_options_flow(hass):
     """Verify standalone updating parameters process correctly through the options layer."""
     entry = MockConfigEntry(
         domain=DOMAIN,
-        data={CONF_API_TOKEN: "token", CONF_STROOM_PROVIDER: "EE", CONF_GAS_PROVIDER: "EE"},
+        data={
+            CONF_API_TOKEN: "token",
+            CONF_STROOM_PROVIDER: "EE",
+            CONF_GAS_PROVIDER: "EE",
+        },
         options={CONF_SCAN_INTERVAL: 3600},
     )
     entry.add_to_hass(hass)
