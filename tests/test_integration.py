@@ -1,6 +1,4 @@
 import pytest
-import respx
-from httpx import Response
 from unittest.mock import patch
 
 from homeassistant.core import HomeAssistant
@@ -20,7 +18,6 @@ from custom_components.enever_prijzen.const import (
 # =========================================================================
 # 1. FLOW ENGINE VALIDATION SECTOR
 # =========================================================================
-
 
 @pytest.mark.asyncio
 async def test_config_flow_lifecycle(hass: HomeAssistant):
@@ -50,11 +47,7 @@ async def test_options_flow_interval_update(hass: HomeAssistant):
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Enever Prices",
-        data={
-            CONF_API_TOKEN: "mock-token",
-            CONF_STROOM_PROVIDER: "EE",
-            CONF_GAS_PROVIDER: "EE",
-        },
+        data={CONF_API_TOKEN: "mock-token", CONF_STROOM_PROVIDER: "EE", CONF_GAS_PROVIDER: "EE"},
         options={CONF_SCAN_INTERVAL: 3600},
         entry_id="enever_options_test",
     )
@@ -76,10 +69,8 @@ async def test_options_flow_interval_update(hass: HomeAssistant):
 # 2. ENDPOINT INTERCEPTION & STATE SECTOR
 # =========================================================================
 
-
 @pytest.mark.asyncio
-@respx.mock
-async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant):
+async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant, aioclient_mock):
     """Test aiohttp scraping routes map payloads to historical attribute dictionaries."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -96,38 +87,33 @@ async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant):
     # Generate an active dynamic date matching the exact hour string requested by sensor filters
     current_time_str = dt_util.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # Intercept each external PHP API file request smoothly
-    respx.get("https://enever.nl/apiv3/stroomprijs_vandaag.php?token=valid-token").mock(
-        return_value=Response(
-            200, json={"data": [{"datum": current_time_str, "prijsEE": "0.2450"}]}
-        )
+    # Correctly intercept the aiohttp requests using the native HA aioclient_mock fixture
+    aioclient_mock.get(
+        "https://enever.nl/apiv3/stroomprijs_vandaag.php?token=valid-token",
+        json={"data": [{"datum": current_time_str, "prijsEE": "0.2450"}]}
     )
-    respx.get("https://enever.nl/apiv3/stroomprijs_morgen.php?token=valid-token").mock(
-        return_value=Response(200, json={"data": []})
+    aioclient_mock.get(
+        "https://enever.nl/apiv3/stroomprijs_morgen.php?token=valid-token",
+        json={"data": []}
     )
-    respx.get("https://enever.nl/apiv3/gasprijs_vandaag.php?token=valid-token").mock(
-        return_value=Response(
-            200, json={"data": [{"datum": current_time_str, "prijsEE": "1.1500"}]}
-        )
+    aioclient_mock.get(
+        "https://enever.nl/apiv3/gasprijs_vandaag.php?token=valid-token",
+        json={"data": [{"datum": current_time_str, "prijsEE": "1.1500"}]}
     )
 
     # Ensure local file system calls during initial empty cache reading do not halt setup processing
-    with (
-        patch(
-            "custom_components.enever_prijzen.cache.EneverCache.load_cache",
-            return_value={"stroom": [], "gas": []},
-        ),
-        patch("custom_components.enever_prijzen.cache.EneverCache.save_cache"),
-    ):
+    with patch("custom_components.enever_prijzen.cache.EneverCache.load_cache", return_value={"stroom": [], "gas": []}), \
+         patch("custom_components.enever_prijzen.cache.EneverCache.save_cache"):
+         
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
-    # Verify sensor state values match float conversion calculations
-    stroom_sensor = hass.states.get("sensor.enever_energieprijzen_stroom")
+    # Verify sensor state values using the precise translation naming keys confirmed by the logs
+    stroom_sensor = hass.states.get("sensor.enever_energieprijzen_current_power_price")
     assert stroom_sensor is not None
     assert stroom_sensor.state == "0.245"
 
-    gas_sensor = hass.states.get("sensor.enever_energieprijzen_gas")
+    gas_sensor = hass.states.get("sensor.enever_energieprijzen_current_gas_price")
     assert gas_sensor is not None
     assert gas_sensor.state == "1.15"
 
@@ -136,10 +122,8 @@ async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant):
 # 3. SAFETY CONTROLLER SECTOR (HIBERNATION WINTERSLAAP)
 # =========================================================================
 
-
 @pytest.mark.asyncio
-@respx.mock
-async def test_api_limit_hibernation_safeguard(hass: HomeAssistant):
+async def test_api_limit_hibernation_safeguard(hass: HomeAssistant, aioclient_mock):
     """Test engine enters automatic hibernation upon capturing limit error notice payloads."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -153,20 +137,15 @@ async def test_api_limit_hibernation_safeguard(hass: HomeAssistant):
     )
     entry.add_to_hass(hass)
 
-    # Simulate hitting your limit by forcing code 6 response parameters from the remote server
-    respx.get(
-        "https://enever.nl/apiv3/stroomprijs_vandaag.php?token=limited-token"
-    ).mock(
-        return_value=Response(200, json={"code": "6", "message": "API limit reached"})
+    # Simulate hitting your limit via aiohttp mocking
+    aioclient_mock.get(
+        "https://enever.nl/apiv3/stroomprijs_vandaag.php?token=limited-token",
+        json={"code": "6", "message": "API limit reached"}
     )
 
-    with patch(
-        "custom_components.enever_prijzen.cache.EneverCache.load_cache",
-        return_value={"stroom": [], "gas": []},
-    ):
+    with patch("custom_components.enever_prijzen.cache.EneverCache.load_cache", return_value={"stroom": [], "gas": []}):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
-    # Ensure persistent notifications are deployed onto the user's interface queue
-    notifications = hass.data.get("persistent_notification")
-    assert "enever_api_limit" in notifications
+    # Read the persistent notification directly from the state engine
+    assert hass.states.get("persistent_notification.enever_api_limit") is not None
