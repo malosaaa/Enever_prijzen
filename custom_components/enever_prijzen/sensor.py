@@ -56,7 +56,8 @@ class EneverStroomSensor(EneverBaseEntity):
     @property
     def state(self):
         stroom_data = self.coordinator.data.get("stroom", [])
-        if not stroom_data: return None
+        if not stroom_data:
+            return None
         
         now = dt_util.now()
         for item in stroom_data:
@@ -65,7 +66,8 @@ class EneverStroomSensor(EneverBaseEntity):
                 if dt.year == now.year and dt.month == now.month and dt.day == now.day and dt.hour == now.hour:
                     val = item.get(self._api_key)
                     return float(val) if val is not None else None
-            except Exception: continue
+            except Exception:
+                continue
         return None
 
     @property
@@ -94,12 +96,14 @@ class EneverGasSensor(EneverBaseEntity):
     @property
     def state(self):
         gas_data = self.coordinator.data.get("gas", [])
-        if not gas_data: return None
+        if not gas_data:
+            return None
         
         try:
             val = gas_data[0].get(self._api_key)
             return float(val) if val is not None else None
-        except Exception: return None
+        except Exception:
+            return None
 
     @property
     def extra_state_attributes(self):
@@ -112,7 +116,8 @@ class EneverStatusSensor(EneverBaseEntity):
         self._attr_unique_id = f"{self._device_id}_{key}"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = icon
-        if dev_class: self._attr_device_class = dev_class
+        if dev_class:
+            self._attr_device_class = dev_class
 
     @property
     def state(self):
