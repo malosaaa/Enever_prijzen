@@ -4,6 +4,7 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class EneverCache:
     def __init__(self, hass):
         self.hass = hass
@@ -13,7 +14,7 @@ class EneverCache:
     def load_cache(self):
         if os.path.exists(self.cache_path):
             try:
-                with open(self.cache_path, 'r', encoding='utf-8') as f:
+                with open(self.cache_path, "r", encoding="utf-8") as f:
                     return json.load(f)
             except Exception as e:
                 _LOGGER.error("Fout bij laden cache: %s", e)
@@ -21,7 +22,7 @@ class EneverCache:
 
     def save_cache(self, data):
         try:
-            with open(self.cache_path, 'w', encoding='utf-8') as f:
+            with open(self.cache_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
         except Exception as e:
             _LOGGER.error("Fout bij opslaan cache: %s", e)

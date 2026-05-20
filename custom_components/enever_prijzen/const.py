@@ -4,7 +4,7 @@ CONF_STROOM_PROVIDER = "stroom_provider"
 CONF_GAS_PROVIDER = "gas_provider"
 CONF_SCAN_INTERVAL = "scan_interval"
 
-DEFAULT_SCAN_INTERVAL = 3600 # 1x per uur updaten is genoeg
+DEFAULT_SCAN_INTERVAL = 3600  # 1x per uur updaten is genoeg
 
 PROVIDERS = {
     "ANWB": "ANWB Energie",
@@ -32,7 +32,7 @@ PROVIDERS = {
     "VON": "Vrij op naam",
     "WE": "Wout Energie",
     "ZG": "ZonderGas",
-    "ZP": "Zonneplan"
+    "ZP": "Zonneplan",
 }
 
 PLATFORMS = ["sensor"]

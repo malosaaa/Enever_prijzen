@@ -7,7 +7,7 @@ manifest_data = {
     "config_flow": True,
     "version": "1.0.0",
     "dependencies": [],
-    "integration_type": "service"
+    "integration_type": "service",
 }
 
 en_data = {
@@ -15,7 +15,12 @@ en_data = {
         "step": {
             "user": {
                 "title": "Enever API",
-                "data": {"api_token": "API Token", "stroom_provider": "Power Provider", "gas_provider": "Gas Provider", "scan_interval": "Scan Interval (s)"}
+                "data": {
+                    "api_token": "API Token",
+                    "stroom_provider": "Power Provider",
+                    "gas_provider": "Gas Provider",
+                    "scan_interval": "Scan Interval (s)",
+                },
             }
         }
     },
@@ -24,9 +29,9 @@ en_data = {
             "current_power": {"name": "Current Power Price"},
             "current_gas": {"name": "Current Gas Price"},
             "last_update": {"name": "Last Update"},
-            "errors": {"name": "Errors"}
+            "errors": {"name": "Errors"},
         }
-    }
+    },
 }
 
 nl_data = {
@@ -34,7 +39,12 @@ nl_data = {
         "step": {
             "user": {
                 "title": "Enever API",
-                "data": {"api_token": "API Token", "stroom_provider": "Stroom Leverancier", "gas_provider": "Gas Leverancier", "scan_interval": "Scan Interval (s)"}
+                "data": {
+                    "api_token": "API Token",
+                    "stroom_provider": "Stroom Leverancier",
+                    "gas_provider": "Gas Leverancier",
+                    "scan_interval": "Scan Interval (s)",
+                },
             }
         }
     },
@@ -43,10 +53,11 @@ nl_data = {
             "current_power": {"name": "Actuele Stroomprijs"},
             "current_gas": {"name": "Actuele Gasprijs"},
             "last_update": {"name": "Laatste Update"},
-            "errors": {"name": "Fouten"}
+            "errors": {"name": "Fouten"},
         }
-    }
+    },
 }
+
 
 def create_files():
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -59,6 +70,7 @@ def create_files():
     with open(os.path.join(translations_dir, "nl.json"), "w", encoding="utf-8") as f:
         json.dump(nl_data, f, indent=2)
     print("✅ Klaar!")
+
 
 if __name__ == "__main__":
     create_files()
