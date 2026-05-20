@@ -132,6 +132,7 @@ async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant, aioclient
 # 3. SAFETY CONTROLLER SECTOR (HIBERNATION OOO YEAH)
 # =========================================================================
 
+
 @pytest.mark.asyncio
 async def test_api_limit_hibernation_safeguard(hass: HomeAssistant, aioclient_mock):
     """Test engine enters automatic hibernation upon capturing limit error notice payloads."""
@@ -150,19 +151,25 @@ async def test_api_limit_hibernation_safeguard(hass: HomeAssistant, aioclient_mo
     # Simulate hitting your limit via aiohttp mocking
     aioclient_mock.get(
         "https://enever.nl/apiv3/stroomprijs_vandaag.php?token=limited-token",
-        json={"code": "6", "message": "API limit reached"}
+        json={"code": "6", "message": "API limit reached"},
     )
 
     # Intercept both the cache loader and the persistent notification engine
-    with patch("custom_components.enever_prijzen.cache.EneverCache.load_cache", return_value={"stroom": [], "gas": []}), \
-         patch("homeassistant.components.persistent_notification.async_create") as mock_notify:
-        
+    with (
+        patch(
+            "custom_components.enever_prijzen.cache.EneverCache.load_cache",
+            return_value={"stroom": [], "gas": []},
+        ),
+        patch(
+            "homeassistant.components.persistent_notification.async_create"
+        ) as mock_notify,
+    ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
         # Verify the persistent notification was triggered with the correct ID
         mock_notify.assert_called_once()
-        
+
         # Check that the kwargs contained our specific notification ID
         kwargs = mock_notify.call_args[1]
         assert kwargs.get("notification_id") == "enever_api_limit"
