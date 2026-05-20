@@ -107,16 +107,19 @@ async def test_coordinator_api_limit_hibernation(
 
 @pytest.mark.asyncio
 @patch("custom_components.enever_prijzen.coordinator.async_get_clientsession")
-async def test_coordinator_exception_handling(
-    mock_get_session, hass: HomeAssistant, mock_entry, mock_cache
-):
+@pytest.mark.asyncio
+@patch("custom_components.enever_prijzen.coordinator.async_get_clientsession")
+async def test_coordinator_exception_handling(mock_get_session, hass: HomeAssistant, mock_entry, mock_cache):
     """Ensure network failures are captured cleanly and error telemetry registers."""
     coord = EneverCoordinator(hass, mock_entry, mock_cache)
     coord._is_first_run = False
     coord.last_data = {"stroom": [], "gas": []}
 
-    mock_get_session.side_effect = Exception("Connection Timeout")
-
+    # FIX: Allow the session to be built, but make the network fetch .get() throw the timeout exception
+    mock_session = MagicMock()
+    mock_session.get.side_effect = Exception("Connection Timeout")
+    mock_get_session.return_value = mock_session
+    
     result = await coord._async_update_data()
     assert coord.error_count == 1
     assert result == {"stroom": [], "gas": []}
