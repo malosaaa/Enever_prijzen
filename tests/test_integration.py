@@ -19,6 +19,7 @@ from custom_components.enever_prijzen.const import (
 # 1. FLOW ENGINE VALIDATION SECTOR
 # =========================================================================
 
+
 @pytest.mark.asyncio
 async def test_config_flow_lifecycle(hass: HomeAssistant):
     """Test initial flow initialization setup saves entries with target schemas."""
@@ -47,7 +48,11 @@ async def test_options_flow_interval_update(hass: HomeAssistant):
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Enever Prices",
-        data={CONF_API_TOKEN: "mock-token", CONF_STROOM_PROVIDER: "EE", CONF_GAS_PROVIDER: "EE"},
+        data={
+            CONF_API_TOKEN: "mock-token",
+            CONF_STROOM_PROVIDER: "EE",
+            CONF_GAS_PROVIDER: "EE",
+        },
         options={CONF_SCAN_INTERVAL: 3600},
         entry_id="enever_options_test",
     )
@@ -68,6 +73,7 @@ async def test_options_flow_interval_update(hass: HomeAssistant):
 # =========================================================================
 # 2. ENDPOINT INTERCEPTION & STATE SECTOR
 # =========================================================================
+
 
 @pytest.mark.asyncio
 async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant, aioclient_mock):
@@ -90,21 +96,25 @@ async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant, aioclient
     # Correctly intercept the aiohttp requests using the native HA aioclient_mock fixture
     aioclient_mock.get(
         "https://enever.nl/apiv3/stroomprijs_vandaag.php?token=valid-token",
-        json={"data": [{"datum": current_time_str, "prijsEE": "0.2450"}]}
+        json={"data": [{"datum": current_time_str, "prijsEE": "0.2450"}]},
     )
     aioclient_mock.get(
         "https://enever.nl/apiv3/stroomprijs_morgen.php?token=valid-token",
-        json={"data": []}
+        json={"data": []},
     )
     aioclient_mock.get(
         "https://enever.nl/apiv3/gasprijs_vandaag.php?token=valid-token",
-        json={"data": [{"datum": current_time_str, "prijsEE": "1.1500"}]}
+        json={"data": [{"datum": current_time_str, "prijsEE": "1.1500"}]},
     )
 
     # Ensure local file system calls during initial empty cache reading do not halt setup processing
-    with patch("custom_components.enever_prijzen.cache.EneverCache.load_cache", return_value={"stroom": [], "gas": []}), \
-         patch("custom_components.enever_prijzen.cache.EneverCache.save_cache"):
-         
+    with (
+        patch(
+            "custom_components.enever_prijzen.cache.EneverCache.load_cache",
+            return_value={"stroom": [], "gas": []},
+        ),
+        patch("custom_components.enever_prijzen.cache.EneverCache.save_cache"),
+    ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
@@ -121,6 +131,7 @@ async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant, aioclient
 # =========================================================================
 # 3. SAFETY CONTROLLER SECTOR (HIBERNATION WINTERSLAAP)
 # =========================================================================
+
 
 @pytest.mark.asyncio
 async def test_api_limit_hibernation_safeguard(hass: HomeAssistant, aioclient_mock):
@@ -140,10 +151,13 @@ async def test_api_limit_hibernation_safeguard(hass: HomeAssistant, aioclient_mo
     # Simulate hitting your limit via aiohttp mocking
     aioclient_mock.get(
         "https://enever.nl/apiv3/stroomprijs_vandaag.php?token=limited-token",
-        json={"code": "6", "message": "API limit reached"}
+        json={"code": "6", "message": "API limit reached"},
     )
 
-    with patch("custom_components.enever_prijzen.cache.EneverCache.load_cache", return_value={"stroom": [], "gas": []}):
+    with patch(
+        "custom_components.enever_prijzen.cache.EneverCache.load_cache",
+        return_value={"stroom": [], "gas": []},
+    ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
