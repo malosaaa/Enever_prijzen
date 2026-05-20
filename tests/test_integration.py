@@ -21,6 +21,7 @@ from custom_components.enever_prijzen.const import (
 # 1. FLOW ENGINE VALIDATION SECTOR
 # =========================================================================
 
+
 @pytest.mark.asyncio
 async def test_config_flow_lifecycle(hass: HomeAssistant):
     """Test initial flow initialization setup saves entries with target schemas."""
@@ -49,7 +50,11 @@ async def test_options_flow_interval_update(hass: HomeAssistant):
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Enever Prices",
-        data={CONF_API_TOKEN: "mock-token", CONF_STROOM_PROVIDER: "EE", CONF_GAS_PROVIDER: "EE"},
+        data={
+            CONF_API_TOKEN: "mock-token",
+            CONF_STROOM_PROVIDER: "EE",
+            CONF_GAS_PROVIDER: "EE",
+        },
         options={CONF_SCAN_INTERVAL: 3600},
         entry_id="enever_options_test",
     )
@@ -70,6 +75,7 @@ async def test_options_flow_interval_update(hass: HomeAssistant):
 # =========================================================================
 # 2. ENDPOINT INTERCEPTION & STATE SECTOR
 # =========================================================================
+
 
 @pytest.mark.asyncio
 @respx.mock
@@ -92,19 +98,27 @@ async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant):
 
     # Intercept each external PHP API file request smoothly
     respx.get("https://enever.nl/apiv3/stroomprijs_vandaag.php?token=valid-token").mock(
-        return_value=Response(200, json={"data": [{"datum": current_time_str, "prijsEE": "0.2450"}]})
+        return_value=Response(
+            200, json={"data": [{"datum": current_time_str, "prijsEE": "0.2450"}]}
+        )
     )
     respx.get("https://enever.nl/apiv3/stroomprijs_morgen.php?token=valid-token").mock(
         return_value=Response(200, json={"data": []})
     )
     respx.get("https://enever.nl/apiv3/gasprijs_vandaag.php?token=valid-token").mock(
-        return_value=Response(200, json={"data": [{"datum": current_time_str, "prijsEE": "1.1500"}]})
+        return_value=Response(
+            200, json={"data": [{"datum": current_time_str, "prijsEE": "1.1500"}]}
+        )
     )
 
     # Ensure local file system calls during initial empty cache reading do not halt setup processing
-    with patch("custom_components.enever_prijzen.cache.EneverCache.load_cache", return_value={"stroom": [], "gas": []}), \
-         patch("custom_components.enever_prijzen.cache.EneverCache.save_cache"):
-         
+    with (
+        patch(
+            "custom_components.enever_prijzen.cache.EneverCache.load_cache",
+            return_value={"stroom": [], "gas": []},
+        ),
+        patch("custom_components.enever_prijzen.cache.EneverCache.save_cache"),
+    ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
@@ -121,6 +135,7 @@ async def test_coordinator_sensor_extraction_loop(hass: HomeAssistant):
 # =========================================================================
 # 3. SAFETY CONTROLLER SECTOR (HIBERNATION WINTERSLAAP)
 # =========================================================================
+
 
 @pytest.mark.asyncio
 @respx.mock
@@ -139,11 +154,16 @@ async def test_api_limit_hibernation_safeguard(hass: HomeAssistant):
     entry.add_to_hass(hass)
 
     # Simulate hitting your limit by forcing code 6 response parameters from the remote server
-    respx.get("https://enever.nl/apiv3/stroomprijs_vandaag.php?token=limited-token").mock(
+    respx.get(
+        "https://enever.nl/apiv3/stroomprijs_vandaag.php?token=limited-token"
+    ).mock(
         return_value=Response(200, json={"code": "6", "message": "API limit reached"})
     )
 
-    with patch("custom_components.enever_prijzen.cache.EneverCache.load_cache", return_value={"stroom": [], "gas": []}):
+    with patch(
+        "custom_components.enever_prijzen.cache.EneverCache.load_cache",
+        return_value={"stroom": [], "gas": []},
+    ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
