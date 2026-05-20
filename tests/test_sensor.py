@@ -1,12 +1,13 @@
 import pytest
 from datetime import datetime
 from unittest.mock import MagicMock, patch
-from homeassistant.const import EntityCategory
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.enever_prijzen.sensor import (
-    EneverStroomSensor, EneverGasSensor, EneverStatusSensor, async_setup_entry
+    EneverStroomSensor,
+    EneverGasSensor,
+    EneverStatusSensor,
 )
+
 
 @pytest.fixture
 def mock_coordinator():
@@ -15,12 +16,10 @@ def mock_coordinator():
     coord.data = {
         "stroom": [
             {"datum": "2026-05-20 16:00:00", "prijsEE": 0.12000},
-            {"datum": "2026-05-20 17:00:00", "prijsEE": 0.18500}, # Active match hour
-            {"datum": "2026-05-20 18:00:00", "prijsEE": 0.22000}
+            {"datum": "2026-05-20 17:00:00", "prijsEE": 0.18500},  # Active match hour
+            {"datum": "2026-05-20 18:00:00", "prijsEE": 0.22000},
         ],
-        "gas": [
-            {"datum": "2026-05-20 00:00:00", "prijsEE": 1.15430}
-        ]
+        "gas": [{"datum": "2026-05-20 00:00:00", "prijsEE": 1.15430}],
     }
     coord.last_update_success_timestamp = "2026-05-20T17:01:00+00:00"
     coord.error_count = 0
@@ -30,13 +29,15 @@ def mock_coordinator():
 def test_stroom_sensor_time_matching(mock_coordinator):
     """Verify that electricity sensor identifies the correct current hour block row properly."""
     sensor = EneverStroomSensor(mock_coordinator, "EE")
-    
+
     assert sensor.unique_id == "enever_energieprijzen_stroom"
     assert sensor.native_unit_of_measurement == "EUR/kWh"
 
     # Set system time context directly to match our 17:00 row entry
     mock_now = datetime(2026, 5, 20, 17, 30, 0)
-    with patch("custom_components.enever_prijzen.sensor.dt_util.now", return_value=mock_now):
+    with patch(
+        "custom_components.enever_prijzen.sensor.dt_util.now", return_value=mock_now
+    ):
         assert sensor.state == 0.18500
 
     # Test attributes list map matching history sets
@@ -60,8 +61,12 @@ def test_gas_sensor_and_empty_fallbacks(mock_coordinator):
 
 def test_status_diagnostic_sensors(mock_coordinator):
     """Verify diagnostic sensor arrays accurately display operational states."""
-    update_sensor = EneverStatusSensor(mock_coordinator, "last_update", "Laatste Update", "mdi:clock", "timestamp")
-    error_sensor = EneverStatusSensor(mock_coordinator, "errors", "Fouten", "mdi:alert", None)
+    update_sensor = EneverStatusSensor(
+        mock_coordinator, "last_update", "Laatste Update", "mdi:clock", "timestamp"
+    )
+    error_sensor = EneverStatusSensor(
+        mock_coordinator, "errors", "Fouten", "mdi:alert", None
+    )
 
     assert update_sensor.state == "2026-05-20T17:01:00+00:00"
     assert error_sensor.state == 0

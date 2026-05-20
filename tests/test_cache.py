@@ -1,7 +1,6 @@
-import pytest
-import os
 from unittest.mock import MagicMock, patch, mock_open
 from custom_components.enever_prijzen.cache import EneverCache
+
 
 def test_cache_management_pipeline():
     """Verify JSON persistence layer writes text strings and handles corrupted reads gracefully."""
@@ -13,7 +12,10 @@ def test_cache_management_pipeline():
         assert cache.load_cache() == {"stroom": [], "gas": []}
 
     # 2. Test reading corrupted structural profiles skips and logs out exceptions
-    with patch("os.path.exists", return_value=True), patch("builtins.open", mock_open(read_data="NOT_JSON")):
+    with (
+        patch("os.path.exists", return_value=True),
+        patch("builtins.open", mock_open(read_data="NOT_JSON")),
+    ):
         assert cache.load_cache() == {"stroom": [], "gas": []}
 
     # 3. Test writing payloads cleanly triggers save sequences
