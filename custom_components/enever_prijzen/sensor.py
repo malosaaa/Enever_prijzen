@@ -7,26 +7,57 @@ from .const import DOMAIN, PROVIDERS
 
 # Koppel de gekozen naam aan de code in de Enever API
 PROVIDER_KEYS = {
-    "ANWB": "prijsANWB", "BE": "prijsBE", "CB": "prijsCB", "ED": "prijsED",
-    "EE": "prijsEE", "EG": "prijsEG", "EN": "prijsEN", "ES": "prijsES",
-    "EVO": "prijsEVO", "EZ": "prijsEZ", "FR": "prijsFR", "GSL": "prijsGSL",
-    "HE": "prijsHE", "IN": "prijsIN", "MDE": "prijsMDE", "NE": "prijsNE",
-    "PE": "prijsPE", "QU": "prijsQU", "SS": "prijsSS", "TI": "prijsTI",
-    "VDB": "prijsVDB", "VF": "prijsVF", "VON": "prijsVON", "WE": "prijsWE",
-    "ZG": "prijsZG", "ZP": "prijsZP"
+    "ANWB": "prijsANWB",
+    "BE": "prijsBE",
+    "CB": "prijsCB",
+    "ED": "prijsED",
+    "EE": "prijsEE",
+    "EG": "prijsEG",
+    "EN": "prijsEN",
+    "ES": "prijsES",
+    "EVO": "prijsEVO",
+    "EZ": "prijsEZ",
+    "FR": "prijsFR",
+    "GSL": "prijsGSL",
+    "HE": "prijsHE",
+    "IN": "prijsIN",
+    "MDE": "prijsMDE",
+    "NE": "prijsNE",
+    "PE": "prijsPE",
+    "QU": "prijsQU",
+    "SS": "prijsSS",
+    "TI": "prijsTI",
+    "VDB": "prijsVDB",
+    "VF": "prijsVF",
+    "VON": "prijsVON",
+    "WE": "prijsWE",
+    "ZG": "prijsZG",
+    "ZP": "prijsZP",
 }
+
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
     stroom_prov = entry.data.get("stroom_provider", "EE")
     gas_prov = entry.data.get("gas_provider", "EE")
-    
-    async_add_entities([
-        EneverStroomSensor(coordinator, stroom_prov),
-        EneverGasSensor(coordinator, gas_prov),
-        EneverStatusSensor(coordinator, "last_update", "Laatste Update", "mdi:clock-outline", SensorDeviceClass.TIMESTAMP),
-        EneverStatusSensor(coordinator, "errors", "Fouten", "mdi:alert-circle-outline", None)
-    ])
+
+    async_add_entities(
+        [
+            EneverStroomSensor(coordinator, stroom_prov),
+            EneverGasSensor(coordinator, gas_prov),
+            EneverStatusSensor(
+                coordinator,
+                "last_update",
+                "Laatste Update",
+                "mdi:clock-outline",
+                SensorDeviceClass.TIMESTAMP,
+            ),
+            EneverStatusSensor(
+                coordinator, "errors", "Fouten", "mdi:alert-circle-outline", None
+            ),
+        ]
+    )
+
 
 class EneverBaseEntity(CoordinatorEntity, SensorEntity):
     def __init__(self, coordinator):
@@ -43,6 +74,7 @@ class EneverBaseEntity(CoordinatorEntity, SensorEntity):
             model="Dynamische Tarieven",
         )
 
+
 class EneverStroomSensor(EneverBaseEntity):
     def __init__(self, coordinator, provider):
         super().__init__(coordinator)
@@ -58,12 +90,17 @@ class EneverStroomSensor(EneverBaseEntity):
         stroom_data = self.coordinator.data.get("stroom", [])
         if not stroom_data:
             return None
-        
+
         now = dt_util.now()
         for item in stroom_data:
             try:
                 dt = datetime.fromisoformat(item["datum"])
-                if dt.year == now.year and dt.month == now.month and dt.day == now.day and dt.hour == now.hour:
+                if (
+                    dt.year == now.year
+                    and dt.month == now.month
+                    and dt.day == now.day
+                    and dt.hour == now.hour
+                ):
                     val = item.get(self._api_key)
                     return float(val) if val is not None else None
             except Exception:
@@ -77,11 +114,12 @@ class EneverStroomSensor(EneverBaseEntity):
         for item in stroom_data:
             val = item.get(self._api_key)
             if val is not None:
-                history.append({
-                    "datum": item.get("datum"),
-                    "prijs": float(val)
-                })
-        return {"provider": PROVIDERS.get(self._provider, self._provider), "all_prices": history}
+                history.append({"datum": item.get("datum"), "prijs": float(val)})
+        return {
+            "provider": PROVIDERS.get(self._provider, self._provider),
+            "all_prices": history,
+        }
+
 
 class EneverGasSensor(EneverBaseEntity):
     def __init__(self, coordinator, provider):
@@ -98,7 +136,7 @@ class EneverGasSensor(EneverBaseEntity):
         gas_data = self.coordinator.data.get("gas", [])
         if not gas_data:
             return None
-        
+
         try:
             val = gas_data[0].get(self._api_key)
             return float(val) if val is not None else None
@@ -108,6 +146,7 @@ class EneverGasSensor(EneverBaseEntity):
     @property
     def extra_state_attributes(self):
         return {"provider": PROVIDERS.get(self._provider, self._provider)}
+
 
 class EneverStatusSensor(EneverBaseEntity):
     def __init__(self, coordinator, key, name, icon, dev_class):

@@ -7,18 +7,21 @@ from .cache import EneverCache
 
 _LOGGER = logging.getLogger(__name__)
 
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     cache_module = EneverCache(hass)
     coordinator = EneverCoordinator(hass, entry, cache_module)
-    
+
     coordinator.last_data = await hass.async_add_executor_job(cache_module.load_cache)
-    
+
     if coordinator.last_data.get("stroom") or coordinator.last_data.get("gas"):
         coordinator.data = coordinator.last_data
-        entry.async_create_background_task(hass, coordinator.async_request_refresh(), "enever_bg_refresh")
+        entry.async_create_background_task(
+            hass, coordinator.async_request_refresh(), "enever_bg_refresh"
+        )
     else:
         await coordinator.async_config_entry_first_refresh()
-    
+
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
     async def handle_refresh(call: ServiceCall):
@@ -36,8 +39,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(entry.add_update_listener(update_listener))
     return True
 
+
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
     await hass.config_entries.async_reload(entry.entry_id)
+
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
